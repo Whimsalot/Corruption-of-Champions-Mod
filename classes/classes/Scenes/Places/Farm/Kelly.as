@@ -193,7 +193,7 @@ private function resistKeltsBSBreakHimIntro():void {
 	}
 	else {
 		kellySprite();
-		approachKelly();
+		approachKelly(true);
 	}
 }
 
@@ -662,7 +662,6 @@ private function keltFucksShitUpII():void {
 	combat.cleanupAfterCombat();
 }
 
-
 //Appearance
 private function kellyAppearance():void {
 	clearOutput();
@@ -681,20 +680,7 @@ private function kellyAppearance():void {
 	if (flags[kFLAGS.KELLY_CUNT_TYPE] == 0) outputText("pink pussy");
 	else outputText("puffy, black mare-cunt");
 	outputText(" placed below her hindquarters.  It is almost constantly dripping rivulets of moisture when you're around.  Its shining openness seems to welcome you in her warmth.");
-	if (flags[kFLAGS.KELLY_HEAT_TIME] > 0 && !pregnancy.isPregnant) outputText("<b>  There is so much leaking from her that you think she might be in heat, rendering her more receptive to impregnation.</b>");
 	outputText("\n\nShe has a human-like asshole, placed right between her horse butt-cheeks where it belongs.");
-	
-	switch (pregnancy.event) {
-		case 1: outputText("\n\n<b>Her barrel-like belly is bulging slightly more than it normally does.</b>");
-				break;
-		case 2: outputText("\n\n<b>Her pregnancy is becoming obvious, her horse belly more and more distended each day.</b>");
-				break;
-		case 3: outputText("\n\n<b>Her belly is swollen and often wiggles around as your rambunctious offspring moves inside her.</b>");
-				break;
-		case 4: outputText("\n\n<b>Her body is absolutely bloated with new life and she moves with a slow, deliberate sway.  Even her boobs and lips seem more swollen and sensitive than usual: her skin is flushed and her expression is one of deep, motherly content.  She can't be far from giving birth now.</b>");
-				break;
-		default:
-	}
 	if (farm.farmCorruption.hasTattoo("kelly"))
 	{
 		outputText("\n\n");
@@ -713,24 +699,11 @@ private function kellyAppearance():void {
 			if (flags[kFLAGS.KELLY_TATTOO_BUTT] != 0) outputText(flags[kFLAGS.KELLY_TATTOO_BUTT]);
 		}
 	}
-
-	//Kids flavour text
-	if (flags[kFLAGS.KELLY_KIDS] > 0) {
-		if (flags[kFLAGS.KELLY_KIDS] == 1) {
-			outputText("\n\nKelly's ");
-			if (flags[kFLAGS.KELLY_FIRST_KID_GENDER] == 1) outputText("son");
-			else outputText("daughter");
-			outputText(" is off in a separate field; still very young, you can see ");
-			if (flags[kFLAGS.KELLY_FIRST_KID_GENDER] == 1) outputText("him playing in the distance, lost in his own little world.");
-			else outputText("her playing in the distance, lost in her own little world.");
-		}
-		else if (flags[kFLAGS.KELLY_KIDS] == 2) outputText("\n\nThe " + num2Text(flags[kFLAGS.KELLY_KIDS]) + " children you have had with Kelly are off in a separate field; the sound of their play drifts over the grasslands to your ears.  Kelly evidently prefers to keep her brood away from what you do with her, a remarkably sensible attitude coming from a centauress cumslut.  Maybe motherhood genuinely suits her?");
-		else outputText("\n\nThe " + num2Text(flags[kFLAGS.KELLY_KIDS]) + " children you have had with Kelly are as ever off in a separate field, the distance sounds of their acting out the wars and drama of childhood drifting out over the grasslands to your ears.");
-	}
 	menu();
 	addButton(0,"Next",approachKelly);
 }
-private function approachKelly():void {
+
+private function approachKelly(approaching:Boolean = false):void {
 	clearOutput();
 	kellySprite();
 	//Fix hair color!
@@ -741,7 +714,6 @@ private function approachKelly():void {
 		punishKelly();
 		return;
 	}
-	
 	//Descriptions and Flavour Text
 	//Pointless, it's already part of the farm desciption
 	//if (flags[kFLAGS.FARM_CORRUPTION_STARTED] == 0) outputText("You aren't welcome on the farm proper, but you can go visit Kelly's field.");
@@ -754,9 +726,10 @@ private function approachKelly():void {
 		if (flags[kFLAGS.KELLY_BONUS_BOOB_ROWS] > 0) outputText("the top row of ");
 		outputText("her milk-laden tits.  When she dreamily opens her eyes and sees you standing there, she nudges them off gently.");
 		outputText("\n\n\"<i>That's enough, little ones.  Mommy needs her daddy time now.</i>\"  Your two centaur children make grumpy 'awww's as they are pulled away from her oozing nipples, but they freeze when they turn around and see you, their milk slathered mouths open in a kind of awe.  They clop off in a hurry as Kelly rearranges her hair and gets up to greet you, the peace in her emerald eyes slowly burnt away by desire.");
+		kellyBellyBlurb();
 	}
 	//15:00-16:00, 4 or more children:
-	else if (getGame().time.hours >= 15 && getGame().time.hours <= 16 && flags[kFLAGS.KELLY_KIDS] >= 4) {
+	else if (getGame().time.hours >= 15 && getGame().time.hours <= 16 && flags[kFLAGS.KELLY_KIDS] >= 4 && approaching) {
 		outputText("You see Kelly standing in the middle of her field, surrounded by her children.  She has the butts set up and, judging by the way she is talking and gesturing with the bow in her hand, is teaching your brood how to shoot.  Trying to, anyway: her big, bare boobs make things a bit difficult.  You see she's actually gone to the trouble of constructing adorable little mini-bows, which the group of centaur children are all threading mini-arrows on as she points, and with expressions of deep concentration, pulling tight, taking aim, and... there's a cacophony of whistling, and arrows wind up everywhere but the target.  The sound of shouting and crying echoes across the field as Kelly begins to ball out the one who somehow managed to shoot an arrow through her braid.");
 		outputText("\n\nYou decide to come back a bit later.  Your kids need all the help they can get.");
 		doNext(camp.returnToCampUseOneHour);
@@ -765,49 +738,48 @@ private function approachKelly():void {
 	//Standard:
 	else {
 		outputText("As soon as you enter the big, grassy expanse beyond the barns, your centaur slave canters over, radiating happiness and hunger.  \"<i>[Master], you've come to visit! Is it feeding time?</i>\"");
-	}	
+		kellyBellyBlurb();
+		//Kids flavour text
+		if (flags[kFLAGS.KELLY_KIDS] > 0) {
+			if (flags[kFLAGS.KELLY_KIDS] == 1) {
+				outputText("\n\nKelly's ");
+				if (flags[kFLAGS.KELLY_FIRST_KID_GENDER] == 1) outputText("son");
+				else outputText("daughter");
+				outputText(" is off in a separate field; still very young, you can see ");
+				if (flags[kFLAGS.KELLY_FIRST_KID_GENDER] == 1) outputText("him playing in the distance, lost in his own little world.");
+				else outputText("her playing in the distance, lost in her own little world.");
+			}
+			else if (flags[kFLAGS.KELLY_KIDS] == 2) outputText("\n\nThe " + num2Text(flags[kFLAGS.KELLY_KIDS]) + " children you have had with Kelly are off in a separate field; the sound of their play drifts over the grasslands to your ears.  Kelly evidently prefers to keep her brood away from what you do with her, a remarkably sensible attitude coming from a centauress cumslut.  Maybe motherhood genuinely suits her?");
+			else outputText("\n\nThe " + num2Text(flags[kFLAGS.KELLY_KIDS]) + " children you have had with Kelly are as ever off in a separate field, the distance sounds of their acting out the wars and drama of childhood drifting out over the grasslands to your ears.");
+		}
+	}
 	menu();
 	addButton(10,"Appearance",kellyAppearance);
 	if (player.lust >= 33) addButton(0,"Sex",kellySexMenu);
-	else {
-		outputText("\n\n<b>You aren't aroused enough to pursue sex with your toy right now.</b>");
-		addDisabledButton(0, "Sex", "This scene requires you to have sufficient arousal.");
-	}
+	else addDisabledButton(0, "Sex", "You aren't aroused enough to pursue sex with your toy right now.");
 	if (flags[kFLAGS.KELLY_CUNT_TYPE] == 0) {
 		if (player.hasItem(consumables.EQUINUM)) {
-			outputText("\n\nYou could give her equinum to gift her with a proper horse-cunt.");
-			addButton(5,"Give Equinum",giveKellyEquinum);
+			addButton(5,"Give Equinum",giveKellyEquinum).hint("You could give her Equinum to gift her with a proper horse-cunt.");
 		}
-		else {
-			outputText("\n\nIf you had equinum, you could give her a proper horse-cunt.");
-			addDisabledButton(5, "Give Equinum", "You need Equinum for this.");
-		}
+		else addDisabledButton(5, "Give Equinum", "If you had Equinum, you could give her a proper horse-cunt.");
 	}
 	else if (flags[kFLAGS.KELLY_CUNT_TYPE] == 1) {
 		if (player.hasItem(consumables.SUCMILK)) {
-			outputText("\n\nYou could give her a succubi milk to get rid of that horse-pussy you gave her before.");
-			addButton(5,"Give SucMilk",giveKellySuccubiMilk);
+			addButton(5,"Give SucMilk",giveKellySuccubiMilk).hint("You could give her a Succubi Milk to get rid of that horse-pussy you gave her before.");
 		}
-		else{
-			outputText("\n\nIf you had succubi milk, you could use that to give her a more human-like vagina.");
-			addDisabledButton(5, "Give SucMilk", "You need a Succubi Milk for this.");
-		}
+		else addDisabledButton(5, "Give SucMilk", "If you had Succubi Milk, you could use that to give her a more human-like vagina.");
 	}
 	if (player.hasItem(consumables.CANINEP)) {
-		outputText("\nYou could give her a canine pepper");
-		if (flags[kFLAGS.KELLY_BONUS_BOOB_ROWS] == 0) outputText(", but who knows how it will change her");
-		outputText(".");
-		addButton(6,"Give CanineP",giveKellyAPepper);
+		if (flags[kFLAGS.KELLY_BONUS_BOOB_ROWS] == 0) addButton(6, "Give CanineP", giveKellyAPepper).hint("You could give her a Canine Pepper, but who knows how it will change her.");
+		else addButton(6,"Give CanineP",giveKellyAPepper).hint("You could give her a Canine Pepper.");
 	}
-	else addDisabledButton(6, "Give CanineP", "You need a Canine Pepper for this.");
+	else addDisabledButton(6, "Give CanineP", "You don't have any Canine Pepper with you.");
 	if (flags[kFLAGS.KELLY_VAGINALLY_FUCKED_COUNT] > 0 && flags[kFLAGS.KELLY_DISOBEYING_COUNTER] >= 3 && player.hasCock()) {
-		outputText("\n\n<b>It looks like Kelly has taken to pleasuring herself again in your absence.  Do you want to take care of that?</b>");
-		addButton(7,"Punish",punishKelly);
+		addButton(7,"Punish",punishKelly).hint("It looks like Kelly has taken to pleasuring herself again in your absence.  Do you want to take care of that?");
 	}
 	else addDisabledButton(7, "Punish", "You have no reason to punish Kelly right now.");
 	if (flags[kFLAGS.TIMES_PUNISHED_KELLY] > 0 && flags[kFLAGS.KELLY_REWARD_COOLDOWN] == 0 && rand(3) == 0) {
-		outputText("\n\n<b>Kelly looks in fine spirits today. Perhaps she's done something worth getting a reward?</b>");
-		addButton(8,"Reward",rewardKelly);
+		addButton(8,"Reward",rewardKelly).hint("Kelly looks in fine spirits today. Perhaps she's done something worth getting a reward?");
 	}
 	else addDisabledButton(8, "Reward", "You have no reason to reward Kelly right now.");
 
@@ -816,6 +788,21 @@ private function approachKelly():void {
 
 	if (flags[kFLAGS.FARM_CORRUPTION_STARTED] == 0)	addButton(14, "Leave", camp.returnToCampUseOneHour);
 	else addButton(14, "Back", farm.farmCorruption.rootScene);
+}
+
+private function kellyBellyBlurb():void {
+	if (flags[kFLAGS.KELLY_HEAT_TIME] > 0 && !pregnancy.isPregnant) outputText("\n\n<b>There is so much fluid leaking from Kellys pussy that you think she might be in heat, rendering her more receptive to impregnation.</b>");
+	switch (pregnancy.event) {
+		case 1: outputText("\n\n<b>Her barrel-like belly is bulging slightly more than it normally does.</b>");
+				break;
+		case 2: outputText("\n\n<b>Her pregnancy is becoming obvious, her horse belly more and more distended each day.</b>");
+				break;
+		case 3: outputText("\n\n<b>Her belly is swollen and often wiggles around as your rambunctious offspring moves inside her.</b>");
+				break;
+		case 4: outputText("\n\n<b>Her body is absolutely bloated with new life and she moves with a slow, deliberate sway.  Even her boobs and lips seem more swollen and sensitive than usual: her skin is flushed and her expression is one of deep, motherly content.  She can't be far from giving birth now.</b>");
+				break;
+		default:
+	}
 }
 
 private function kellySexMenu():void {
@@ -841,8 +828,8 @@ private function kellySexMenu():void {
 		addButton(4,"Talk And HJ",talkNHandToKelly);
 	}
 	addButton(14,"Back",approachKelly);
-	
 }
+
 //Regular scenes
 //Vaginal
 //Virginity paragraph
@@ -1635,7 +1622,7 @@ private function kellyPregSex():void {
  
 //Giving birth
 public function kellyPopsOutARunt():void {
-	outputText("\n<b><u>As you visit the barn where your centaur slave usually resides, you see something unusual...</u></b>");
+	outputText("<b><u>As you visit the barn where your centaur slave usually resides, you see something unusual...</u></b>");
 	outputText("\n\nKelly is laying on a haystack, her face red and slick with sweat but radiating tired happiness.  Curled into one of her milk-engorged breasts, hanging and suckling voraciously, is a tiny little creature that looks exactly like her mother.");
 	
 	outputText("\n\n\"<i>[name]! You're here! Say hi to your new kid!</i>\"");
